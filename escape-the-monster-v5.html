@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Temple Escape 3D - Warrior Runner</title>
+<title>Temple Escape 3D - Smooth Runner</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Trade+Gothic+LT+Bold&family=Russo+One&family=Montserrat:wght@700;900&display=swap');
 
@@ -13,14 +13,14 @@
   }
   body, html {
     width: 100%; height: 100%; overflow: hidden;
-    background: #080d09; font-family: 'Cinzel', serif, sans-serif;
+    background: #080d08; font-family: 'Cinzel', serif, sans-serif;
     color: #f7e7be;
   }
 
   #game-container {
     position: relative; width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
-    background: radial-gradient(circle at center, #1b261b 0%, #060a06 100%);
+    background: #0c140c;
   }
 
   canvas#webgl {
@@ -28,12 +28,36 @@
     outline: none; display: block;
   }
 
+  /* Cinematic Vignette Overlay */
+  #vignette {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 2;
+    background: radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(5,10,6,0.65) 100%);
+  }
+
+  /* Speed Wind Lines FX */
+  #speed-fx {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 3;
+    opacity: 0; transition: opacity 0.3s;
+    background: radial-gradient(circle at center, transparent 40%, rgba(255,180,50,0.15) 80%, rgba(255,100,0,0.3) 100%);
+    box-shadow: inset 0 0 70px rgba(255,140,0,0.35);
+  }
+  #speed-fx.active {
+    opacity: 1;
+    animation: speedPulse 0.15s infinite alternate;
+  }
+  @keyframes speedPulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    100% { transform: scale(1.02); filter: brightness(1.2); }
+  }
+
   /* ====== TEMPLE RUN 2 AUTHENTIC HUD ====== */
   #hud-layer {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 10;
     display: flex; flex-direction: column; justify-content: space-between;
-    padding: 16px 20px;
+    padding: 16px 22px;
   }
 
   /* Top HUD Bar */
@@ -49,41 +73,41 @@
   }
   .power-idol-frame {
     width: 76px; height: 80px;
-    background: radial-gradient(circle, #2d3b2b 40%, #151e14 90%);
-    border: 3px solid #5a7550; border-radius: 16px;
-    box-shadow: 0 0 14px rgba(0,255,100,0.3), inset 0 0 10px rgba(0,0,0,0.8), 0 6px 12px rgba(0,0,0,0.6);
+    background: radial-gradient(circle, #384d35 30%, #152214 85%, #0d160c 100%);
+    border: 3px solid #759a6a; border-radius: 18px;
+    box-shadow: 0 0 16px rgba(0,255,120,0.35), inset 0 0 12px rgba(0,0,0,0.9), 0 8px 16px rgba(0,0,0,0.7);
     display: flex; align-items: center; justify-content: center;
     position: relative; z-index: 2;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   }
   .power-idol-frame.ready {
-    animation: idolPulse 1.2s infinite alternate ease-in-out;
+    animation: idolPulse 1.1s infinite alternate ease-in-out;
     border-color: #00ff88;
-    box-shadow: 0 0 25px #00ff88, inset 0 0 15px #00ff88;
+    box-shadow: 0 0 28px #00ff88, inset 0 0 16px #00ff88, 0 8px 20px rgba(0,255,136,0.5);
   }
   @keyframes idolPulse {
     0% { transform: scale(1); filter: brightness(1); }
-    100% { transform: scale(1.08); filter: brightness(1.3); }
+    100% { transform: scale(1.08); filter: brightness(1.35); }
   }
   .power-icon {
-    font-size: 34px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
+    font-size: 34px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.9));
   }
   .power-bar-v {
     position: absolute; top: 68px; width: 34px; height: 130px;
-    background: #111a12; border: 3px solid #3d4f3a;
-    border-radius: 0 0 12px 12px; overflow: hidden;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.7), inset 0 0 8px #000;
+    background: #0f1810; border: 3px solid #445941;
+    border-radius: 0 0 14px 14px; overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.8), inset 0 0 10px #000;
     display: flex; flex-direction: column; justify-content: flex-end;
   }
   .power-bar-fill {
     width: 100%; height: 0%;
-    background: linear-gradient(0deg, #00b34d 0%, #00ff73 70%, #99ffd0 100%);
-    box-shadow: 0 0 16px #00ff73;
-    transition: height 0.2s ease-out;
+    background: linear-gradient(0deg, #00b34d 0%, #00ff73 65%, #c2ffe1 100%);
+    box-shadow: 0 0 18px #00ff73;
+    transition: height 0.15s ease-out;
   }
   .power-hint {
-    margin-top: 136px; font-size: 11px; font-weight: 900; letter-spacing: 1px;
-    color: #a4f5ab; text-shadow: 0 2px 4px #000; text-transform: uppercase;
+    margin-top: 136px; font-size: 11px; font-weight: 900; letter-spacing: 1.5px;
+    color: #a4f5ab; text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,255,100,0.6); text-transform: uppercase;
   }
 
   /* Top Right: Stone Carved Score & Coin Plaque */
@@ -91,49 +115,61 @@
     display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
   }
   .stone-plaque {
-    background: linear-gradient(180deg, #443c33 0%, #29241e 50%, #1c1814 100%);
-    border: 2px solid #73634e; border-top: 3px solid #998368;
-    border-radius: 10px;
-    padding: 6px 16px; min-width: 170px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    background: linear-gradient(180deg, #4f453a 0%, #2e2821 50%, #1a1612 100%);
+    border: 2px solid #85725a; border-top: 3px solid #b39b7d;
+    border-radius: 12px;
+    padding: 6px 18px; min-width: 175px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: flex-end; gap: 12px;
     position: relative;
   }
   .stone-plaque::before, .stone-plaque::after {
-    content: '◆'; position: absolute; font-size: 9px; color: #438e51;
-    text-shadow: 0 0 5px #00ff73;
+    content: '◆'; position: absolute; font-size: 10px; color: #438e51;
+    text-shadow: 0 0 6px #00ff73;
   }
-  .stone-plaque::before { left: 6px; }
-  .stone-plaque::after { right: 6px; }
+  .stone-plaque::before { left: 8px; }
+  .stone-plaque::after { right: 8px; }
   .plaque-icon {
-    font-size: 20px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+    font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
   }
   .plaque-num {
     font-family: 'Russo One', sans-serif, 'Cinzel';
-    font-size: 22px; font-weight: 900;
-    color: #ffdf78; text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,215,0,0.4);
+    font-size: 23px; font-weight: 900;
+    color: #ffdf78; text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 10px rgba(255,215,0,0.5);
     letter-spacing: 1px;
   }
   .score-val { color: #fdf6d8; }
   .coin-val { color: #ffd13b; }
-  .dist-val { color: #9fe8ff; font-size: 16px; }
+  .dist-val { color: #9fe8ff; font-size: 17px; }
 
   /* Active Powerup Badges */
   .active-powerups {
-    position: absolute; right: 20px; top: 120px;
+    position: absolute; right: 22px; top: 130px;
     display: flex; flex-direction: column; gap: 12px; pointer-events: none;
   }
   .powerup-badge {
-    background: rgba(18, 25, 18, 0.85); border: 2px solid #558055;
-    border-radius: 12px; padding: 6px 12px;
+    background: rgba(14, 24, 15, 0.9); border: 2px solid #639963;
+    border-radius: 14px; padding: 6px 14px;
     display: flex; align-items: center; gap: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 12px rgba(0,255,100,0.3);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.85), 0 0 15px rgba(0,255,100,0.4);
     animation: fadeIn 0.3s forwards;
   }
-  .powerup-badge .p-icon { font-size: 24px; }
+  .powerup-badge .p-icon { font-size: 26px; }
   .powerup-badge .p-timer {
-    font-family: 'Russo One', sans-serif; font-size: 16px; color: #fff;
-    text-shadow: 0 0 8px #00ff73;
+    font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff;
+    text-shadow: 0 0 10px #00ff73;
+  }
+
+  /* Center Banner Messages */
+  #banner-msg {
+    position: absolute; top: 26%; left: 50%; transform: translate(-50%, -50%) scale(0);
+    font-size: 40px; font-weight: 900; font-family: 'Russo One', sans-serif;
+    color: #ffe678; text-shadow: 0 0 25px #ff9900, 0 4px 12px #000;
+    text-align: center; pointer-events: none; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s;
+    opacity: 0; z-index: 15; text-transform: uppercase; letter-spacing: 2px;
+  }
+  #banner-msg.show {
+    transform: translate(-50%, -50%) scale(1); opacity: 1;
   }
 
   /* Bottom Controls & Pause */
@@ -142,128 +178,126 @@
     width: 100%;
   }
   .touch-stick-area {
-    display: flex; gap: 12px; pointer-events: auto;
+    display: flex; gap: 14px; pointer-events: auto;
   }
   .hud-touch-btn {
     width: 66px; height: 66px; border-radius: 50%;
-    background: radial-gradient(circle, #384936 0%, #172116 100%);
-    border: 3px solid #6b8c65;
-    color: #e2f7dd; font-size: 22px; font-weight: 900;
+    background: radial-gradient(circle, #42583f 0%, #1c2a1b 100%);
+    border: 3px solid #7ea877;
+    color: #e2f7dd; font-size: 24px; font-weight: 900;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.2);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.85), inset 0 2px 5px rgba(255,255,255,0.25);
     cursor: pointer; transition: transform 0.1s, background 0.1s;
     touch-action: none;
   }
   .hud-touch-btn:active {
-    transform: scale(0.92); background: #4e6b4b;
+    transform: scale(0.92); background: #5a7d56;
     box-shadow: 0 2px 6px rgba(0,0,0,0.9);
   }
 
   .pause-btn-frame {
     pointer-events: auto; cursor: pointer;
-    width: 68px; height: 68px; border-radius: 18px;
-    background: radial-gradient(circle, #443c33 0%, #1e1915 100%);
-    border: 3px solid #78644e;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.8), inset 0 2px 6px rgba(0,0,0,0.9);
-    display: flex; align-items: center; justify-content: center; gap: 5px;
+    width: 66px; height: 66px; border-radius: 20px;
+    background: radial-gradient(circle, #4d4439 0%, #241d18 100%);
+    border: 3px solid #8a735a;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.85), inset 0 2px 6px rgba(0,0,0,0.9);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
     transition: transform 0.15s;
   }
   .pause-btn-frame:hover { transform: scale(1.06); }
   .pause-btn-frame:active { transform: scale(0.94); }
   .pause-bar {
     width: 8px; height: 26px; background: linear-gradient(180deg, #ffd752 0%, #ca9616 100%);
-    border-radius: 3px; box-shadow: 0 0 8px rgba(255,215,0,0.5);
+    border-radius: 4px; box-shadow: 0 0 10px rgba(255,215,0,0.6);
   }
 
-  /* Center Banner Messages */
-  #banner-msg {
-    position: absolute; top: 28%; left: 50%; transform: translate(-50%, -50%) scale(0);
-    font-size: 38px; font-weight: 900; font-family: 'Russo One', sans-serif;
-    color: #ffe678; text-shadow: 0 0 20px #ff9900, 0 4px 10px #000;
-    text-align: center; pointer-events: none; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s;
-    opacity: 0; z-index: 15; text-transform: uppercase; letter-spacing: 2px;
+  /* Mute Sound Button */
+  #mute-btn {
+    position: absolute; top: 16px; left: 110px;
+    background: rgba(22, 33, 22, 0.85); border: 2px solid #5a7d56;
+    color: #dbfed4; border-radius: 12px; padding: 8px 14px;
+    font-size: 13px; font-weight: 700; cursor: pointer; pointer-events: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.7); z-index: 12;
+    transition: background 0.2s, transform 0.15s;
   }
-  #banner-msg.show {
-    transform: translate(-50%, -50%) scale(1); opacity: 1;
-  }
+  #mute-btn:hover { background: #354e33; transform: scale(1.04); }
 
   /* ====== MENUS / OVERLAYS ====== */
   .menu-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(8, 12, 8, 0.88); backdrop-filter: blur(8px);
+    background: rgba(6, 10, 7, 0.85); backdrop-filter: blur(10px);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 30; padding: 20px; text-align: center;
   }
   .menu-card {
-    background: radial-gradient(circle at 50% 20%, #303d2b 0%, #151d14 80%, #0c120b 100%);
-    border: 4px solid #6c885c; border-radius: 20px;
-    padding: 32px 40px; max-width: 480px; width: 92%;
-    box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.8), 0 0 30px rgba(78, 140, 78, 0.3);
-    position: relative;
+    background: radial-gradient(circle at 50% 20%, #34442f 0%, #192418 70%, #0e160e 100%);
+    border: 4px solid #7ea36e; border-radius: 24px;
+    padding: 34px 42px; max-width: 490px; width: 92%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 35px rgba(0,255,100,0.25), inset 0 2px 6px rgba(255,255,255,0.2);
+    display: flex; flex-direction: column; align-items: center; gap: 15px;
   }
   .menu-title {
-    font-size: 34px; font-weight: 900; letter-spacing: 3px;
-    color: #ffdf70; text-shadow: 0 0 15px rgba(255,200,50,0.6), 0 4px 8px #000;
-    margin-bottom: 12px; text-transform: uppercase;
+    font-family: 'Cinzel', serif; font-size: 34px; font-weight: 900;
+    color: #ffdf78; text-shadow: 0 3px 8px #000, 0 0 20px rgba(255,215,0,0.6);
+    letter-spacing: 2px;
   }
   .menu-subtitle {
-    font-size: 14px; color: #b7d1b3; margin-bottom: 24px; line-height: 1.5;
+    font-size: 13px; color: #aed9a8; line-height: 1.5; max-width: 380px;
   }
   .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;
+    margin-top: 6px;
   }
   .stat-box {
-    background: rgba(10, 16, 10, 0.7); border: 2px solid #435b3e; border-radius: 10px;
-    padding: 10px; display: flex; flex-direction: column; align-items: center;
+    background: rgba(14, 22, 14, 0.8); border: 2px solid #4a6845;
+    border-radius: 14px; padding: 10px 14px;
+    display: flex; flex-direction: column; align-items: center;
   }
-  .stat-label { font-size: 11px; color: #8ba986; text-transform: uppercase; letter-spacing: 1px; }
-  .stat-val { font-family: 'Russo One', sans-serif; font-size: 22px; color: #ffd13b; margin-top: 4px; }
-
+  .stat-label {
+    font-size: 11px; color: #88af83; font-weight: 700; letter-spacing: 1px;
+  }
+  .stat-val {
+    font-family: 'Russo One', sans-serif; font-size: 22px; color: #ffdf78;
+    margin-top: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  }
   .temple-btn {
-    background: linear-gradient(180deg, #ff9429 0%, #d85c00 60%, #993b00 100%);
-    border: 3px solid #ffcb66; border-radius: 12px;
-    color: #fff; font-family: 'Russo One', sans-serif; font-size: 22px;
-    padding: 14px 38px; cursor: pointer; letter-spacing: 2px;
-    box-shadow: 0 8px 20px rgba(216, 92, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.4);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    transition: transform 0.15s, filter 0.15s;
-    text-transform: uppercase; width: 100%; margin-top: 8px;
+    background: linear-gradient(180deg, #ffd752 0%, #d49514 50%, #946205 100%);
+    border: 3px solid #fff2a8; border-radius: 16px;
+    color: #241400; font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900;
+    padding: 13px 36px; cursor: pointer; margin-top: 10px; width: 100%;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.85), 0 0 20px rgba(255,215,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6);
+    transition: transform 0.15s, filter 0.15s; letter-spacing: 1.5px;
   }
-  .temple-btn:hover { transform: scale(1.04); filter: brightness(1.15); }
-  .temple-btn:active { transform: scale(0.96); filter: brightness(0.9); }
-
+  .temple-btn:hover {
+    transform: scale(1.03); filter: brightness(1.15);
+  }
+  .temple-btn:active {
+    transform: scale(0.97); filter: brightness(0.9);
+  }
   .controls-guide {
-    margin-top: 20px; font-size: 12px; color: #9bb597; line-height: 1.6;
-    border-top: 1px solid #334830; padding-top: 14px;
+    font-size: 12px; color: #b7dbb2; line-height: 1.8; margin-top: 8px; text-align: left; width: 100%;
+    background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: 12px; border: 1px solid #334830;
   }
   .key-chip {
-    background: #253322; border: 1px solid #53734e; border-radius: 4px;
-    padding: 2px 6px; color: #ffeb99; font-weight: bold; font-family: monospace;
-  }
-
-  /* Audio mute toggle */
-  #mute-btn {
-    position: absolute; top: 16px; left: 110px; z-index: 25;
-    background: #293626; border: 2px solid #557050; border-radius: 8px;
-    color: #eee; font-size: 16px; padding: 6px 12px; cursor: pointer;
-    pointer-events: auto;
+    background: #253323; border: 1px solid #577852; border-radius: 6px;
+    padding: 2px 8px; font-family: monospace; font-size: 11px; color: #ffdf78; font-weight: 900;
   }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 
   /* Mobile responsiveness */
   @media (max-width: 600px) {
-    .power-idol-frame { width: 60px; height: 64px; }
-    .power-icon { font-size: 26px; }
-    .power-bar-v { top: 54px; width: 28px; height: 95px; }
-    .power-hint { margin-top: 100px; font-size: 9px; }
-    .stone-plaque { min-width: 120px; padding: 4px 10px; }
-    .plaque-num { font-size: 17px; }
-    .menu-card { padding: 22px 20px; }
+    .power-idol-frame { width: 62px; height: 66px; }
+    .power-icon { font-size: 28px; }
+    .power-bar-v { top: 56px; width: 28px; height: 100px; }
+    .power-hint { margin-top: 104px; font-size: 9px; }
+    .stone-plaque { min-width: 130px; padding: 5px 12px; }
+    .plaque-num { font-size: 18px; }
+    .menu-card { padding: 24px 20px; }
     .menu-title { font-size: 26px; }
     #banner-msg { font-size: 28px; }
-    .hud-touch-btn { width: 56px; height: 56px; font-size: 18px; }
-    #mute-btn { left: 90px; }
+    .hud-touch-btn { width: 56px; height: 56px; font-size: 20px; }
+    #mute-btn { left: 86px; top: 12px; padding: 6px 10px; font-size: 11px; }
   }
 </style>
 <!-- Three.js CDN -->
@@ -273,6 +307,8 @@
 
 <div id="game-container">
   <canvas id="webgl"></canvas>
+  <div id="vignette"></div>
+  <div id="speed-fx"></div>
 
   <button id="mute-btn">🔊 Sound</button>
 
@@ -301,7 +337,7 @@
           <span class="plaque-icon">💎</span>
           <span class="plaque-num coin-val" id="coinDisplay">0</span>
         </div>
-        <div class="stone-plaque" style="min-width: 120px;">
+        <div class="stone-plaque" style="min-width: 130px;">
           <span class="plaque-icon">🏃</span>
           <span class="plaque-num dist-val" id="distDisplay">0 m</span>
         </div>
@@ -336,7 +372,7 @@
   <div class="menu-overlay" id="startMenu">
     <div class="menu-card">
       <div class="menu-title">TEMPLE ESCAPE 3D</div>
-      <div class="menu-subtitle">Outrun the Cursed Demon Monkey through ancient canyon temple ruins!</div>
+      <div class="menu-subtitle">Outrun the Cursed Demon Beast through the ancient canyon temple ruins!</div>
       
       <div class="stats-grid">
         <div class="stat-box">
@@ -354,9 +390,9 @@
       <div class="controls-guide">
         <p><span class="key-chip">A</span> / <span class="key-chip">←</span> : Move LEFT</p>
         <p><span class="key-chip">D</span> / <span class="key-chip">→</span> : Move RIGHT</p>
-        <p><span class="key-chip">W</span> / <span class="key-chip">↑</span> / <span class="key-chip">SPACE</span> : Jump over logs & barriers</p>
-        <p><span class="key-chip">S</span> / <span class="key-chip">↓</span> : Slide under stone arches & vines</p>
-        <p><span class="key-chip">E</span> or Tap Idol : Activate Flame Boost ability!</p>
+        <p><span class="key-chip">W</span> / <span class="key-chip">↑</span> / <span class="key-chip">SPACE</span> : Jump over spiked logs & fire pits</p>
+        <p><span class="key-chip">S</span> / <span class="key-chip">↓</span> : Slide under stone arches & ancient roots</p>
+        <p><span class="key-chip">E</span> or Tap Idol : Activate Supersonic Flame Boost!</p>
       </div>
     </div>
   </div>
@@ -364,8 +400,8 @@
   <!-- Game Over Overlay -->
   <div class="menu-overlay" id="gameOverMenu" style="display: none;">
     <div class="menu-card">
-      <div class="menu-title" style="color: #ff4b4b;">YOU WERE CAUGHT!</div>
-      <div class="menu-subtitle" id="deathReason">The Demon Monkey seized you in the ruins.</div>
+      <div class="menu-title" style="color: #ff5252;">YOU WERE CAUGHT!</div>
+      <div class="menu-subtitle" id="deathReason">The Demon Beast seized you in the ruins.</div>
       
       <div class="stats-grid">
         <div class="stat-box">
@@ -403,7 +439,7 @@
 
 <script>
 /* =========================================================================
-   TEMPLE ESCAPE 3D - FULL THREE.JS WEBGL ENGINE
+   TEMPLE ESCAPE 3D - CLEAN HIGH-PERFORMANCE ENGINE
    ========================================================================= */
 
 // --- Audio Synthesizer (Web Audio API) ---
@@ -445,9 +481,9 @@ class SoundController {
     osc.stop(t0 + duration);
   }
   playCoin() {
-    const baseFreq = 880 + (Math.random() * 80);
-    this.playTone(baseFreq, 0.12, 'triangle', 0.12);
-    this.playTone(baseFreq * 1.5, 0.15, 'sine', 0.08, 0.04);
+    const baseFreq = 920 + (Math.random() * 80);
+    this.playTone(baseFreq, 0.12, 'triangle', 0.14);
+    this.playTone(baseFreq * 1.5, 0.15, 'sine', 0.1, 0.04);
   }
   playJump() {
     if (this.muted || !this.ctx) return;
@@ -455,15 +491,15 @@ class SoundController {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(260, t0);
-    osc.frequency.exponentialRampToValueAtTime(650, t0 + 0.18);
-    gain.gain.setValueAtTime(0.2, t0);
-    gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.2);
+    osc.frequency.setValueAtTime(280, t0);
+    osc.frequency.exponentialRampToValueAtTime(700, t0 + 0.2);
+    gain.gain.setValueAtTime(0.22, t0);
+    gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.22);
     osc.connect(gain); gain.connect(this.ctx.destination);
-    osc.start(t0); osc.stop(t0 + 0.2);
+    osc.start(t0); osc.stop(t0 + 0.22);
   }
   playSlide() {
-    this.playTone(180, 0.16, 'sawtooth', 0.1);
+    this.playTone(190, 0.18, 'sawtooth', 0.12);
   }
   playDemonRoar() {
     if (this.muted || !this.ctx) return;
@@ -471,21 +507,21 @@ class SoundController {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(110, t0);
-    osc.frequency.linearRampToValueAtTime(55, t0 + 0.6);
-    gain.gain.setValueAtTime(0.35, t0);
-    gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.7);
+    osc.frequency.setValueAtTime(120, t0);
+    osc.frequency.linearRampToValueAtTime(45, t0 + 0.7);
+    gain.gain.setValueAtTime(0.4, t0);
+    gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.8);
     osc.connect(gain); gain.connect(this.ctx.destination);
-    osc.start(t0); osc.stop(t0 + 0.7);
+    osc.start(t0); osc.stop(t0 + 0.8);
   }
   playPowerup() {
-    const notes = [523.25, 659.25, 783.99, 1046.50];
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
     notes.forEach((freq, i) => {
-      this.playTone(freq, 0.25, 'triangle', 0.15, i * 0.07);
+      this.playTone(freq, 0.28, 'triangle', 0.16, i * 0.06);
     });
   }
   playHit() {
-    this.playTone(90, 0.3, 'square', 0.3);
+    this.playTone(80, 0.35, 'square', 0.35);
   }
   startJungleDrums() {
     if (this.bgmTimer) clearInterval(this.bgmTimer);
@@ -493,31 +529,98 @@ class SoundController {
       if (this.muted || !this.ctx || gameState !== 'PLAYING') return;
       this.step = (this.step + 1) % 8;
       if (this.step === 0 || this.step === 4) {
-        this.playTone(70, 0.12, 'triangle', 0.16);
+        this.playTone(65, 0.14, 'triangle', 0.2);
       } else if (this.step === 2 || this.step === 6) {
-        this.playTone(130, 0.09, 'sine', 0.12);
+        this.playTone(125, 0.1, 'sine', 0.14);
       } else if (this.step === 3 || this.step === 7) {
-        this.playTone(280, 0.05, 'square', 0.04);
+        this.playTone(290, 0.05, 'square', 0.05);
       }
-    }, 180);
+    }, 175);
   }
 }
 const sound = new SoundController();
 
 /* =========================================================================
-   GAME CONSTANTS & SCREEN-MAPPED LANES
+   CLEAN SOFT PROCEDURAL TEXTURES (NO MOIRE STRIPING)
    ========================================================================= */
+
+function createStoneFloorTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#9b8d74';
+  ctx.fillRect(0, 0, 512, 512);
+
+  ctx.strokeStyle = '#4e4233';
+  ctx.lineWidth = 6;
+  const tileH = 64;
+  for (let y = 0; y < 512; y += tileH) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(512, y);
+    ctx.stroke();
+
+    const offset = ((y / tileH) % 2) * 128;
+    for (let x = -offset; x < 512; x += 256) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + tileH);
+      ctx.stroke();
+    }
+  }
+
+  const grad = ctx.createLinearGradient(0, 0, 512, 0);
+  grad.addColorStop(0, 'rgba(55,80,45,0.4)');
+  grad.addColorStop(0.15, 'rgba(55,80,45,0.05)');
+  grad.addColorStop(0.85, 'rgba(55,80,45,0.05)');
+  grad.addColorStop(1, 'rgba(55,80,45,0.4)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(1, 6);
+  return tex;
+}
+
+function createCliffTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  grad.addColorStop(0, '#384d2f');
+  grad.addColorStop(0.2, '#66523c');
+  grad.addColorStop(0.5, '#785f47');
+  grad.addColorStop(0.8, '#594432');
+  grad.addColorStop(1, '#2d241c');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 512);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  for (let i = 40; i < 512; i += 70) {
+    ctx.fillRect(0, i, 256, 12);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  for (let i = 75; i < 512; i += 70) {
+    ctx.fillRect(0, i, 256, 10);
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  return tex;
+}
+
 const LANE_WIDTH = 2.4;
 
-// Looking into +Z from -Z:
-// Screen LEFT is +LANE_WIDTH (+X)
-// Screen CENTER is 0
-// Screen RIGHT is -LANE_WIDTH (-X)
-// Lane index: -1 = LEFT, 0 = CENTER, +1 = RIGHT
 const LANES = {
-  '-1': LANE_WIDTH,   // Left lane on screen
-  '0': 0,             // Center lane
-  '1': -LANE_WIDTH    // Right lane on screen
+  '-1': LANE_WIDTH,
+  '0': 0,
+  '1': -LANE_WIDTH
 };
 
 const CHUNK_LENGTH = 50;
@@ -535,18 +638,16 @@ let bestDistance = parseInt(localStorage.getItem('temple_best_dist') || '0');
 
 let runSpeed = 26;
 const BASE_SPEED = 26;
-const MAX_SPEED = 52;
+const MAX_SPEED = 54;
 let powerMeter = 0;
 let cameraShake = 0;
 
-// Active Powerups
 const powerups = {
   magnet: 0,
   wings: 0,
   shield: 0
 };
 
-// --- Three.js Globals ---
 let scene, camera, renderer;
 let playerGroup, warriorMesh, wingsMesh, shieldMesh;
 let demonGroup;
@@ -554,9 +655,11 @@ let activeChunks = [];
 let chunkZ = 0;
 let clock = new THREE.Clock();
 
-// --- Player State ---
+let particleSystem;
+let torchFlames = [];
+
 const player = {
-  lane: 0, // -1 (Left), 0 (Center), 1 (Right)
+  lane: 0,
   targetX: 0,
   x: 0,
   y: 0,
@@ -570,17 +673,15 @@ const player = {
   hasShield: false
 };
 
-// --- Demon State ---
 const demon = {
-  gap: 8.5,
-  targetGap: 8.5,
+  gap: 8.0,
+  targetGap: 8.0,
   x: 0,
   y: 0,
-  z: -8.5,
+  z: -8.0,
   animTime: 0
 };
 
-// UI Elements
 const scoreDisplay = document.getElementById('scoreDisplay');
 const coinDisplay = document.getElementById('coinDisplay');
 const distDisplay = document.getElementById('distDisplay');
@@ -589,6 +690,7 @@ const powerFrame = document.getElementById('powerFrame');
 const powerHint = document.getElementById('powerHint');
 const powerupsList = document.getElementById('powerupsList');
 const bannerMsg = document.getElementById('banner-msg');
+const speedFx = document.getElementById('speed-fx');
 
 const startMenu = document.getElementById('startMenu');
 const gameOverMenu = document.getElementById('gameOverMenu');
@@ -599,48 +701,114 @@ const totalGemsVal = document.getElementById('totalGemsVal');
 highScoreVal.textContent = highScore.toLocaleString();
 totalGemsVal.textContent = totalGems.toLocaleString();
 
-/* =========================================================================
-   SMOOTH ROUNDED BARBARIAN WARRIOR 3D MATERIALS & GEOMETRIES
-   ========================================================================= */
+let mats;
 
-const mats = {
-  // World
-  stoneFloor: new THREE.MeshStandardMaterial({ color: 0x8a7f66, roughness: 0.85, metalness: 0.1 }),
-  stoneTrim: new THREE.MeshStandardMaterial({ color: 0x5a513e, roughness: 0.9 }),
-  cliffRock: new THREE.MeshStandardMaterial({ color: 0x4f4433, roughness: 0.95, flatShading: true }),
-  mossRock: new THREE.MeshStandardMaterial({ color: 0x3d502f, roughness: 0.9, flatShading: true }),
-  leaves: new THREE.MeshStandardMaterial({ color: 0x2d6b2b, roughness: 0.7, flatShading: true }),
-  wood: new THREE.MeshStandardMaterial({ color: 0x4a2e18, roughness: 0.85 }),
-  goldCoin: new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.25, emissive: 0x553300 }),
-  rubyGem: new THREE.MeshStandardMaterial({ color: 0xff2244, metalness: 0.6, roughness: 0.2, emissive: 0x440011 }),
-  torchFire: new THREE.MeshBasicMaterial({ color: 0xff7700 }),
+function initMaterials() {
+  const stoneFloorTex = createStoneFloorTexture();
+  const cliffTex = createCliffTexture();
 
-  // Smooth Shaded Warrior Gladiator Materials
-  skin: new THREE.MeshStandardMaterial({ color: 0xe09b70, roughness: 0.52, metalness: 0.05, flatShading: false }),
-  skinShade: new THREE.MeshStandardMaterial({ color: 0xc87d52, roughness: 0.58, flatShading: false }),
-  mustache: new THREE.MeshStandardMaterial({ color: 0x753a1e, roughness: 0.75, flatShading: false }),
-  leatherPants: new THREE.MeshStandardMaterial({ color: 0x6e331f, roughness: 0.8, flatShading: false }),
-  leatherBracer: new THREE.MeshStandardMaterial({ color: 0x4e2314, roughness: 0.6, flatShading: false }),
-  goldArmor: new THREE.MeshStandardMaterial({ color: 0xe5ac36, metalness: 0.85, roughness: 0.28, emissive: 0x332205, flatShading: false }),
-  blueArmor: new THREE.MeshStandardMaterial({ color: 0x26558f, roughness: 0.45, metalness: 0.4, flatShading: false }),
-  furTrim: new THREE.MeshStandardMaterial({ color: 0xd9b884, roughness: 0.9, flatShading: false }),
-  bootsBase: new THREE.MeshStandardMaterial({ color: 0x331a10, roughness: 0.7, flatShading: false }),
+  mats = {
+    stoneFloor: new THREE.MeshStandardMaterial({
+      map: stoneFloorTex,
+      roughness: 0.65,
+      metalness: 0.1
+    }),
+    stoneTrim: new THREE.MeshStandardMaterial({
+      color: 0x8a7448,
+      roughness: 0.45,
+      metalness: 0.55
+    }),
+    stoneCarved: new THREE.MeshStandardMaterial({
+      color: 0x6e6350,
+      roughness: 0.8,
+      metalness: 0.1
+    }),
+    cliffRock: new THREE.MeshStandardMaterial({
+      map: cliffTex,
+      roughness: 0.9,
+      metalness: 0.05
+    }),
+    mossRock: new THREE.MeshStandardMaterial({
+      map: cliffTex,
+      color: 0x5a754b,
+      roughness: 0.85,
+      metalness: 0.05
+    }),
+    leaves: new THREE.MeshStandardMaterial({
+      color: 0x2b6b25,
+      roughness: 0.7,
+      flatShading: true
+    }),
+    wood: new THREE.MeshStandardMaterial({
+      color: 0x4f311c,
+      roughness: 0.75
+    }),
+    spikes: new THREE.MeshStandardMaterial({
+      color: 0x2b2b2b,
+      metalness: 0.85,
+      roughness: 0.3
+    }),
+    goldCoin: new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      metalness: 0.92,
+      roughness: 0.2,
+      emissive: 0x553300,
+      emissiveIntensity: 0.4
+    }),
+    rubyGem: new THREE.MeshStandardMaterial({
+      color: 0xff2244,
+      metalness: 0.7,
+      roughness: 0.15,
+      emissive: 0x880011,
+      emissiveIntensity: 0.5
+    }),
+    emeraldGem: new THREE.MeshStandardMaterial({
+      color: 0x00ff88,
+      metalness: 0.8,
+      roughness: 0.15,
+      emissive: 0x006633,
+      emissiveIntensity: 0.5
+    }),
+    torchFire: new THREE.MeshBasicMaterial({ color: 0xff7700 }),
+    torchCore: new THREE.MeshBasicMaterial({ color: 0xffe066 }),
 
-  // Demon
-  demonSkin: new THREE.MeshStandardMaterial({ color: 0x1f1917, roughness: 0.85, flatShading: true }),
-  demonEyes: new THREE.MeshBasicMaterial({ color: 0xff0022 }),
-  demonHorns: new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.5 }),
+    skin: new THREE.MeshStandardMaterial({ color: 0xdc9266, roughness: 0.5, metalness: 0.02 }),
+    skinShade: new THREE.MeshStandardMaterial({ color: 0xc27950, roughness: 0.55 }),
+    hairMustache: new THREE.MeshStandardMaterial({ color: 0x542610, roughness: 0.7 }),
+    headband: new THREE.MeshStandardMaterial({ color: 0xb51c1c, roughness: 0.6, metalness: 0.2 }),
+    leatherPants: new THREE.MeshStandardMaterial({ color: 0x5c2c16, roughness: 0.75, metalness: 0.1 }),
+    leatherBracer: new THREE.MeshStandardMaterial({ color: 0x3d1d10, roughness: 0.65, metalness: 0.2 }),
+    goldArmor: new THREE.MeshStandardMaterial({ color: 0xf5c042, metalness: 0.9, roughness: 0.25, emissive: 0x443005 }),
+    blueArmor: new THREE.MeshStandardMaterial({ color: 0x245b99, roughness: 0.45, metalness: 0.5 }),
+    furTrim: new THREE.MeshStandardMaterial({ color: 0xd6ba92, roughness: 0.95 }),
+    bootsBase: new THREE.MeshStandardMaterial({ color: 0x2e180d, roughness: 0.7 }),
 
-  // FX
-  wingsGlow: new THREE.MeshBasicMaterial({ color: 0xff9900, transparent: true, opacity: 0.85, side: THREE.DoubleSide }),
-  shieldAura: new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 0.35, wireframe: true })
-};
+    demonBody: new THREE.MeshStandardMaterial({
+      color: 0x221815,
+      roughness: 0.85,
+      metalness: 0.2,
+      emissive: 0x2b0600,
+      emissiveIntensity: 0.4
+    }),
+    demonEyes: new THREE.MeshBasicMaterial({ color: 0xff1100 }),
+    demonHorns: new THREE.MeshStandardMaterial({ color: 0x0d0d0d, roughness: 0.4, metalness: 0.8 }),
 
-/* --- Build Smooth & Rounded Muscular Barbarian Gladiator 3D Model --- */
+    wingsGlow: new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.85, side: THREE.DoubleSide }),
+    shieldAura: new THREE.MeshStandardMaterial({
+      color: 0x00ffaa,
+      transparent: true,
+      opacity: 0.4,
+      roughness: 0.1,
+      metalness: 0.9,
+      emissive: 0x00ff88,
+      emissiveIntensity: 0.6
+    })
+  };
+}
+
 function createWarriorMesh() {
   const root = new THREE.Group();
 
-  // 1. Pelvis / Hips (Smooth Rounded Base)
   const hips = new THREE.Group();
   hips.position.y = 1.05;
   root.add(hips);
@@ -651,220 +819,111 @@ function createWarriorMesh() {
   pelvis.castShadow = true;
   hips.add(pelvis);
 
-  // Smooth Rounded Warrior Belt with Gold Trim
-  const beltGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.16, 20);
+  const beltGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.14, 20);
   beltGeo.scale(1.02, 1.0, 0.78);
   const belt = new THREE.Mesh(beltGeo, mats.leatherBracer);
   belt.position.y = 0.12;
 
-  const beltGoldTop = new THREE.Mesh(new THREE.TorusGeometry(0.345, 0.02, 8, 24), mats.goldArmor);
-  beltGoldTop.scale.set(1.02, 0.78, 1.0);
-  beltGoldTop.rotation.x = Math.PI / 2;
-  beltGoldTop.position.y = 0.2;
-
-  const beltGoldBot = beltGoldTop.clone();
-  beltGoldBot.position.y = 0.04;
-
-  // Center Ornate Buckle (Golden Rounded Crest)
-  const buckleGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16);
-  const buckle = new THREE.Mesh(buckleGeo, mats.goldArmor);
+  const buckle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.06, 16), mats.goldArmor);
   buckle.rotation.x = Math.PI / 2;
   buckle.position.set(0, 0.12, 0.26);
 
-  const buckleGem = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), mats.blueArmor);
-  buckleGem.position.set(0, 0.12, 0.29);
+  hips.add(belt, buckle);
 
-  hips.add(belt, beltGoldTop, beltGoldBot, buckle, buckleGem);
-
-  // 2. Smooth Contoured Muscular Torso & Spine (V-Taper Anatomy)
   const spine = new THREE.Group();
   spine.position.y = 0.2;
   hips.add(spine);
 
-  // Upper Chest / Ribcage (Smooth anatomical V-taper tapering down to waist)
-  const ribcageGeo = new THREE.CylinderGeometry(0.42, 0.31, 0.58, 20);
+  const ribcageGeo = new THREE.CylinderGeometry(0.42, 0.31, 0.58, 18);
   ribcageGeo.scale(1.08, 1.0, 0.72);
   const ribcage = new THREE.Mesh(ribcageGeo, mats.skin);
   ribcage.position.y = 0.42;
   ribcage.castShadow = true;
   spine.add(ribcage);
 
-  // Sculpted Rounded Pectoral Muscles (Smooth Ellipsoids)
-  const pecGeo = new THREE.SphereGeometry(0.2, 16, 14);
+  const pecGeo = new THREE.SphereGeometry(0.2, 14, 12);
   pecGeo.scale(1.15, 0.85, 0.55);
 
   const leftPec = new THREE.Mesh(pecGeo, mats.skin);
-  leftPec.position.set(0.18, 0.46, 0.18);
+  leftPec.position.set(0.18, 0.48, 0.18);
   leftPec.rotation.z = -0.1;
   const rightPec = new THREE.Mesh(pecGeo, mats.skin);
-  rightPec.position.set(-0.18, 0.46, 0.18);
+  rightPec.position.set(-0.18, 0.48, 0.18);
   rightPec.rotation.z = 0.1;
   spine.add(leftPec, rightPec);
 
-  // Smooth Rounded Six-Pack Abdominals
-  for (let row = 0; row < 3; row++) {
-    const yPos = 0.28 - row * 0.09;
-    const abGeo = new THREE.SphereGeometry(0.075, 12, 10);
-    abGeo.scale(1.2, 0.7, 0.5);
-
-    const abL = new THREE.Mesh(abGeo, mats.skinShade);
-    abL.position.set(0.09, yPos, 0.19 - row * 0.015);
-    const abR = new THREE.Mesh(abGeo, mats.skinShade);
-    abR.position.set(-0.09, yPos, 0.19 - row * 0.015);
-    spine.add(abL, abR);
-  }
-
-  // Muscular Back / Lats Curves
-  const latGeo = new THREE.SphereGeometry(0.18, 14, 12);
-  latGeo.scale(0.8, 1.4, 0.6);
-  const latL = new THREE.Mesh(latGeo, mats.skinShade);
-  latL.position.set(0.26, 0.42, -0.16);
-  const latR = new THREE.Mesh(latGeo, mats.skinShade);
-  latR.position.set(-0.26, 0.42, -0.16);
-  spine.add(latL, latR);
-
-  // 3. Smooth Bald Head with Signature Handlebar Mustache
-  const neckGeo = new THREE.CylinderGeometry(0.15, 0.18, 0.22, 16);
-  const neck = new THREE.Mesh(neckGeo, mats.skin);
-  neck.position.y = 0.72;
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 0.22, 14), mats.skin);
+  neck.position.y = 0.74;
   spine.add(neck);
 
   const headGroup = new THREE.Group();
-  headGroup.position.y = 0.96;
+  headGroup.position.y = 0.98;
   spine.add(headGroup);
 
-  // Smooth Rounded Bald Cranium
-  const skullGeo = new THREE.SphereGeometry(0.28, 22, 22);
-  skullGeo.scale(0.9, 1.15, 1.0);
+  const skullGeo = new THREE.SphereGeometry(0.28, 20, 20);
+  skullGeo.scale(0.92, 1.15, 1.0);
   const skull = new THREE.Mesh(skullGeo, mats.skin);
   skull.castShadow = true;
   headGroup.add(skull);
 
-  // Smooth Rounded Jaw & Chin
-  const jawGeo = new THREE.SphereGeometry(0.18, 16, 14);
-  jawGeo.scale(0.9, 0.8, 0.9);
-  const jaw = new THREE.Mesh(jawGeo, mats.skin);
-  jaw.position.set(0, -0.16, 0.08);
-  headGroup.add(jaw);
+  const bandGeo = new THREE.TorusGeometry(0.27, 0.035, 8, 20);
+  bandGeo.scale(0.94, 1.0, 1.02);
+  const headbandMesh = new THREE.Mesh(bandGeo, mats.headband);
+  headbandMesh.rotation.x = Math.PI / 2 + 0.1;
+  headbandMesh.position.set(0, 0.12, 0);
+  headGroup.add(headbandMesh);
 
-  // Nose (Smooth rounded cone)
-  const noseGeo = new THREE.ConeGeometry(0.06, 0.16, 12);
-  const nose = new THREE.Mesh(noseGeo, mats.skinShade);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.16, 10), mats.skinShade);
   nose.position.set(0, -0.02, 0.29);
   nose.rotation.x = Math.PI / 2.3;
   headGroup.add(nose);
 
-  // Rounded Ears
-  const earGeo = new THREE.SphereGeometry(0.07, 10, 10);
-  earGeo.scale(0.4, 1.2, 0.8);
-  const earL = new THREE.Mesh(earGeo, mats.skin);
-  earL.position.set(0.27, -0.02, 0);
-  const earR = earL.clone();
-  earR.position.x = -0.27;
-  headGroup.add(earL, earR);
-
-  // Thick Brown Eyebrows
-  const browGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.16, 8);
-  const browL = new THREE.Mesh(browGeo, mats.mustache);
-  browL.position.set(0.11, 0.13, 0.26);
-  browL.rotation.z = -Math.PI / 2.3;
-  const browR = new THREE.Mesh(browGeo, mats.mustache);
-  browR.position.set(-0.11, 0.13, 0.26);
-  browR.rotation.z = Math.PI / 2.3;
-  headGroup.add(browL, browR);
-
-  // Giant Smooth 3D Handlebar Mustache
   const stacheGroup = new THREE.Group();
-  stacheGroup.position.set(0, -0.12, 0.28);
-
+  stacheGroup.position.set(0, -0.12, 0.29);
   const stacheCenterGeo = new THREE.SphereGeometry(0.08, 12, 10);
   stacheCenterGeo.scale(1.8, 0.9, 0.8);
-  const stacheCenter = new THREE.Mesh(stacheCenterGeo, mats.mustache);
+  const stacheCenter = new THREE.Mesh(stacheCenterGeo, mats.hairMustache);
   stacheGroup.add(stacheCenter);
 
-  // Smooth Curling Mustache Wings
-  const wingL = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.045, 10, 16, Math.PI / 1.3), mats.mustache);
+  const wingL = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.045, 10, 16, Math.PI / 1.3), mats.hairMustache);
   wingL.position.set(0.15, 0.01, 0);
   wingL.rotation.z = -Math.PI / 2.8;
-  wingL.rotation.y = 0.25;
-
-  const wingR = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.045, 10, 16, Math.PI / 1.3), mats.mustache);
+  const wingR = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.045, 10, 16, Math.PI / 1.3), mats.hairMustache);
   wingR.position.set(-0.15, 0.01, 0);
   wingR.rotation.z = Math.PI / 2.8;
-  wingR.rotation.y = -0.25;
-
   stacheGroup.add(wingL, wingR);
   headGroup.add(stacheGroup);
 
-  // 4. Right Shoulder Smooth Armored Pauldron with Spiky Fur Mantle
   const pauldronGroup = new THREE.Group();
-  pauldronGroup.position.set(-0.52, 0.62, 0);
-
-  // Curved Fur Collar Spikes
-  for (let i = 0; i < 7; i++) {
-    const angle = (i / 7) * Math.PI + 0.15;
-    const spikeGeo = new THREE.ConeGeometry(0.09, 0.36, 6);
-    const spike = new THREE.Mesh(spikeGeo, mats.furTrim);
-    spike.position.set(Math.cos(angle) * 0.24, Math.sin(angle) * 0.16 + 0.04, (Math.random() - 0.5) * 0.16);
-    spike.rotation.z = angle - Math.PI / 2;
-    pauldronGroup.add(spike);
-  }
-
-  // Smooth Spherical Pauldron Dome
-  const domeGeo = new THREE.SphereGeometry(0.26, 16, 16, 0, Math.PI, 0, Math.PI / 1.6);
-  const pauldronPlate = new THREE.Mesh(domeGeo, mats.blueArmor);
+  pauldronGroup.position.set(-0.52, 0.64, 0);
+  const pauldronPlate = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 16, 0, Math.PI, 0, Math.PI / 1.6), mats.blueArmor);
   pauldronPlate.rotation.z = -Math.PI / 2;
   pauldronPlate.position.set(0, 0.1, 0);
-
   const pauldronRim = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.035, 10, 20, Math.PI), mats.goldArmor);
   pauldronRim.rotation.x = Math.PI / 2;
   pauldronRim.position.set(0, 0.08, 0);
-
-  const pauldronGem = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), mats.goldArmor);
-  pauldronGem.position.set(-0.1, 0.16, 0.14);
-
-  pauldronGroup.add(pauldronPlate, pauldronRim, pauldronGem);
+  pauldronGroup.add(pauldronPlate, pauldronRim);
   spine.add(pauldronGroup);
 
-  // 5. Smooth Muscular Rounded Arms with Gauntlet Bracers
   function createWarriorArm(isLeft) {
     const side = isLeft ? 1 : -1;
     const armPivot = new THREE.Group();
-    armPivot.position.set(side * 0.48, 0.56, 0);
+    armPivot.position.set(side * 0.48, 0.58, 0);
 
-    // Rounded Muscular Deltoid Cap (Sphere)
-    const deltoid = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 14), mats.skin);
-    deltoid.position.set(0, -0.02, 0);
+    const deltoid = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 12), mats.skin);
     armPivot.add(deltoid);
 
-    // Bicep / Upper Arm (Smooth Cylinder)
-    const upperArmGeo = new THREE.CylinderGeometry(0.15, 0.13, 0.36, 16);
-    const upperArm = new THREE.Mesh(upperArmGeo, mats.skin);
+    const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.36, 14), mats.skin);
     upperArm.position.y = -0.18;
     upperArm.castShadow = true;
     armPivot.add(upperArm);
 
-    // Elbow Joint (Sphere)
-    const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), mats.skin);
-    elbow.position.y = -0.34;
-    armPivot.add(elbow);
-
-    // Heavy Leather Gauntlet Bracer on Forearm (Smooth Tapered Cylinder)
-    const forearmGeo = new THREE.CylinderGeometry(0.15, 0.13, 0.38, 16);
-    const forearm = new THREE.Mesh(forearmGeo, mats.leatherBracer);
+    const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.38, 14), mats.leatherBracer);
     forearm.position.y = -0.48;
     forearm.castShadow = true;
+    armPivot.add(forearm);
 
-    // Gold Bracer Ring
-    const bracerRing = new THREE.Mesh(new THREE.TorusGeometry(0.152, 0.02, 8, 16), mats.goldArmor);
-    bracerRing.rotation.x = Math.PI / 2;
-    bracerRing.position.y = -0.36;
-    armPivot.add(forearm, bracerRing);
-
-    // Smooth Clenched Fist (Rounded Capsule)
-    const fistGeo = new THREE.SphereGeometry(0.12, 14, 12);
-    fistGeo.scale(1.0, 1.2, 1.0);
-    const fist = new THREE.Mesh(fistGeo, mats.skin);
+    const fist = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), mats.skin);
     fist.position.y = -0.7;
     fist.castShadow = true;
     armPivot.add(fist);
@@ -876,65 +935,31 @@ function createWarriorMesh() {
   const rightArm = createWarriorArm(false);
   spine.add(leftArm, rightArm);
 
-  // 6. Smooth Muscular Legs, Knee Armor, Fur Boot Cuffs & Greaves
   function createWarriorLeg(isLeft) {
     const side = isLeft ? 1 : -1;
     const legPivot = new THREE.Group();
     legPivot.position.set(side * 0.19, -0.06, 0);
 
-    // Smooth Muscular Thigh (Tapered Cylinder)
-    const thighGeo = new THREE.CylinderGeometry(0.17, 0.14, 0.48, 16);
-    const thigh = new THREE.Mesh(thighGeo, mats.leatherPants);
+    const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.14, 0.48, 14), mats.leatherPants);
     thigh.position.y = -0.22;
     thigh.castShadow = true;
     legPivot.add(thigh);
 
-    // Knee Joint (Sphere)
     const kneeJoint = new THREE.Group();
     kneeJoint.position.y = -0.46;
     legPivot.add(kneeJoint);
 
-    const kneeSphere = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), mats.leatherPants);
-    kneeJoint.add(kneeSphere);
-
-    // Smooth Shield-shaped Knee Armor Pad
-    const kneePadGeo = new THREE.SphereGeometry(0.13, 12, 12);
-    kneePadGeo.scale(0.9, 1.2, 0.6);
-    const kneePlate = new THREE.Mesh(kneePadGeo, mats.blueArmor);
-    kneePlate.position.set(0, 0, 0.12);
-
-    const kneeBorder = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.025, 8, 16), mats.goldArmor);
-    kneeBorder.position.set(0, 0, 0.12);
-    kneeJoint.add(kneePlate, kneeBorder);
-
-    // Layer of Organic Fur Cuffs on top of Boots (Signature Feature)
-    for (let f = 0; f < 9; f++) {
-      const fAngle = (f / 9) * Math.PI * 2;
-      const furSpike = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.26, 6), mats.furTrim);
-      furSpike.position.set(Math.cos(fAngle) * 0.17, -0.14, Math.sin(fAngle) * 0.17);
-      furSpike.rotation.x = Math.sin(fAngle) * 0.35;
-      furSpike.rotation.z = -Math.cos(fAngle) * 0.35;
-      kneeJoint.add(furSpike);
-    }
-
-    // Smooth Blue Armored Shin Greaves (Tapered Cylinder)
-    const calfGeo = new THREE.CylinderGeometry(0.15, 0.12, 0.44, 16);
-    const calf = new THREE.Mesh(calfGeo, mats.blueArmor);
+    const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 0.44, 14), mats.blueArmor);
     calf.position.y = -0.28;
     calf.castShadow = true;
     kneeJoint.add(calf);
 
-    // Smooth Rounded Warrior Boot with Gold Sole
-    const bootGeo = new THREE.SphereGeometry(0.14, 14, 12);
+    const bootGeo = new THREE.SphereGeometry(0.14, 12, 12);
     bootGeo.scale(1.0, 0.9, 1.5);
     const boot = new THREE.Mesh(bootGeo, mats.bootsBase);
     boot.position.set(0, -0.48, 0.07);
     boot.castShadow = true;
-
-    const goldSole = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.15, 0.06, 16), mats.goldArmor);
-    goldSole.scale.set(1.02, 1.0, 1.5);
-    goldSole.position.set(0, -0.56, 0.07);
-    kneeJoint.add(boot, goldSole);
+    kneeJoint.add(boot);
 
     legPivot.kneeJoint = kneeJoint;
     return legPivot;
@@ -944,12 +969,11 @@ function createWarriorMesh() {
   const rightLeg = createWarriorLeg(false);
   hips.add(leftLeg, rightLeg);
 
-  // Wings (Flame Boost) Mesh
   const wingShape = new THREE.Shape();
   wingShape.moveTo(0, 0);
-  wingShape.lineTo(1.8, 0.9);
-  wingShape.lineTo(2.4, 0.2);
-  wingShape.lineTo(1.6, -0.4);
+  wingShape.lineTo(1.9, 1.0);
+  wingShape.lineTo(2.4, 0.3);
+  wingShape.lineTo(1.7, -0.4);
   wingShape.lineTo(0, -0.1);
   const wingGeo = new THREE.ShapeGeometry(wingShape);
   
@@ -966,8 +990,7 @@ function createWarriorMesh() {
   root.add(wingsG);
   wingsMesh = wingsG;
 
-  // Shield Bubble
-  const shieldGeo = new THREE.SphereGeometry(1.6, 16, 16);
+  const shieldGeo = new THREE.SphereGeometry(1.6, 20, 20);
   shieldMesh = new THREE.Mesh(shieldGeo, mats.shieldAura);
   shieldMesh.position.y = 1.2;
   shieldMesh.visible = false;
@@ -984,53 +1007,175 @@ function createWarriorMesh() {
   return root;
 }
 
-/* --- Build 3D Chasing Demon Monkey --- */
 function createDemonMesh() {
   const group = new THREE.Group();
 
-  const bodyGeo = new THREE.BoxGeometry(1.6, 1.4, 1.2);
-  const body = new THREE.Mesh(bodyGeo, mats.demonSkin);
+  const bodyGeo = new THREE.CylinderGeometry(1.0, 0.8, 1.6, 14);
+  bodyGeo.scale(1.2, 1.0, 0.85);
+  const body = new THREE.Mesh(bodyGeo, mats.demonBody);
   body.position.y = 1.3;
+  body.rotation.x = 0.35;
   body.castShadow = true;
   group.add(body);
 
-  const headGeo = new THREE.BoxGeometry(1.0, 0.9, 0.9);
-  const head = new THREE.Mesh(headGeo, mats.demonSkin);
-  head.position.set(0, 2.1, 0.4);
+  const headGeo = new THREE.BoxGeometry(1.1, 0.9, 1.0);
+  const head = new THREE.Mesh(headGeo, mats.demonBody);
+  head.position.set(0, 2.1, 0.45);
+  head.castShadow = true;
   group.add(head);
 
-  const eyeGeo = new THREE.BoxGeometry(0.18, 0.12, 0.1);
+  const eyeGeo = new THREE.BoxGeometry(0.2, 0.12, 0.12);
   const leftEye = new THREE.Mesh(eyeGeo, mats.demonEyes);
-  leftEye.position.set(-0.28, 2.15, 0.86);
+  leftEye.position.set(-0.32, 2.15, 0.96);
   const rightEye = new THREE.Mesh(eyeGeo, mats.demonEyes);
-  rightEye.position.set(0.28, 2.15, 0.86);
+  rightEye.position.set(0.32, 2.15, 0.96);
   group.add(leftEye, rightEye);
 
-  const hornGeo = new THREE.ConeGeometry(0.2, 0.8, 5);
+  const hornGeo = new THREE.ConeGeometry(0.22, 0.95, 6);
   const leftHorn = new THREE.Mesh(hornGeo, mats.demonHorns);
-  leftHorn.position.set(-0.45, 2.7, 0.2);
+  leftHorn.position.set(-0.5, 2.7, 0.25);
   leftHorn.rotation.z = -0.5;
   leftHorn.rotation.x = -0.3;
   const rightHorn = leftHorn.clone();
-  rightHorn.position.set(0.45, 2.7, 0.2);
+  rightHorn.position.set(0.5, 2.7, 0.25);
   rightHorn.rotation.z = 0.5;
   group.add(leftHorn, rightHorn);
 
-  const armGeo = new THREE.BoxGeometry(0.45, 1.6, 0.45);
-  const leftArm = new THREE.Mesh(armGeo, mats.demonSkin);
-  leftArm.position.set(-1.05, 0.9, 0.5);
-  leftArm.rotation.x = 0.3;
-  const rightArm = leftArm.clone();
-  rightArm.position.set(1.05, 0.9, 0.5);
-  group.add(leftArm, rightArm);
+  function createDemonArm(isLeft) {
+    const side = isLeft ? 1 : -1;
+    const arm = new THREE.Group();
+    arm.position.set(side * 1.15, 1.8, 0.25);
 
-  group.scale.set(1.4, 1.4, 1.4);
+    const limbGeo = new THREE.CylinderGeometry(0.32, 0.35, 1.5, 10);
+    const limb = new THREE.Mesh(limbGeo, mats.demonBody);
+    limb.position.set(0, -0.65, 0.2);
+    limb.rotation.x = 0.45;
+    limb.castShadow = true;
+    arm.add(limb);
+    return arm;
+  }
+
+  const leftArm = createDemonArm(true);
+  const rightArm = createDemonArm(false);
+  group.add(leftArm, rightArm);
+  group.leftArm = leftArm;
+  group.rightArm = rightArm;
+
+  group.scale.set(1.35, 1.35, 1.35);
   return group;
 }
 
-/* =========================================================================
-   TRACK CHUNK GENERATION & OBSTACLE PLACEMENT
-   ========================================================================= */
+class ParticleEngine {
+  constructor(maxParticles = 160) {
+    this.maxParticles = maxParticles;
+    const geo = new THREE.BufferGeometry();
+    this.positions = new Float32Array(maxParticles * 3);
+    this.colors = new Float32Array(maxParticles * 3);
+    this.lifetimes = new Float32Array(maxParticles);
+    this.maxLifetimes = new Float32Array(maxParticles);
+    this.velocities = [];
+
+    for (let i = 0; i < maxParticles; i++) {
+      this.velocities.push(new THREE.Vector3());
+      this.lifetimes[i] = 0;
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 32; canvas.height = 32;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.5, 'rgba(255,200,80,0.8)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 32, 32);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.6,
+      map: texture,
+      transparent: true,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    this.points = new THREE.Points(geo, mat);
+  }
+
+  emit(x, y, z, vx, vy, vz, r, g, b, life = 0.5) {
+    for (let i = 0; i < this.maxParticles; i++) {
+      if (this.lifetimes[i] <= 0) {
+        this.positions[i * 3]     = x;
+        this.positions[i * 3 + 1] = y;
+        this.positions[i * 3 + 2] = z;
+
+        this.colors[i * 3]     = r;
+        this.colors[i * 3 + 1] = g;
+        this.colors[i * 3 + 2] = b;
+
+        this.velocities[i].set(vx, vy, vz);
+        this.lifetimes[i] = life;
+        this.maxLifetimes[i] = life;
+        break;
+      }
+    }
+  }
+
+  update(delta) {
+    for (let i = 0; i < this.maxParticles; i++) {
+      if (this.lifetimes[i] > 0) {
+        this.lifetimes[i] -= delta;
+        const progress = 1 - (this.lifetimes[i] / this.maxLifetimes[i]);
+
+        this.positions[i * 3]     += this.velocities[i].x * delta;
+        this.positions[i * 3 + 1] += this.velocities[i].y * delta;
+        this.positions[i * 3 + 2] += this.velocities[i].z * delta;
+
+        const fade = Math.max(0, 1 - progress);
+        this.colors[i * 3]     *= fade;
+        this.colors[i * 3 + 1] *= fade;
+        this.colors[i * 3 + 2] *= fade;
+      }
+    }
+    this.points.geometry.attributes.position.needsUpdate = true;
+    this.points.geometry.attributes.color.needsUpdate = true;
+  }
+
+  burstGems(x, y, z) {
+    for (let k = 0; k < 12; k++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.5 + Math.random() * 4;
+      this.emit(
+        x, y, z,
+        Math.cos(angle) * speed,
+        1.5 + Math.random() * 3,
+        Math.sin(angle) * speed,
+        1.0, 0.85, 0.2,
+        0.45
+      );
+    }
+  }
+
+  puffDust(x, y, z) {
+    for (let k = 0; k < 2; k++) {
+      this.emit(
+        x + (Math.random() - 0.5) * 0.3,
+        y + 0.1,
+        z - 0.2,
+        (Math.random() - 0.5) * 1.2,
+        0.6 + Math.random() * 0.8,
+        -1.2 - Math.random() * 1.5,
+        0.7, 0.6, 0.45,
+        0.3
+      );
+    }
+  }
+}
 
 function createTrackChunk() {
   const chunk = new THREE.Group();
@@ -1039,54 +1184,59 @@ function createTrackChunk() {
   chunk.decorations = [];
 
   const roadWidth = LANE_WIDTH * 3.4;
+
   const pathGeo = new THREE.BoxGeometry(roadWidth, 0.8, CHUNK_LENGTH);
   const pathMesh = new THREE.Mesh(pathGeo, mats.stoneFloor);
   pathMesh.position.set(0, -0.4, CHUNK_LENGTH / 2);
   pathMesh.receiveShadow = true;
   chunk.add(pathMesh);
 
-  const railGeo = new THREE.BoxGeometry(0.5, 0.6, CHUNK_LENGTH);
+  const railGeo = new THREE.BoxGeometry(0.5, 0.55, CHUNK_LENGTH);
   const leftRail = new THREE.Mesh(railGeo, mats.stoneTrim);
-  leftRail.position.set(-roadWidth / 2 - 0.25, 0.1, CHUNK_LENGTH / 2);
+  leftRail.position.set(-roadWidth / 2 - 0.25, 0.12, CHUNK_LENGTH / 2);
+  leftRail.receiveShadow = true;
   const rightRail = leftRail.clone();
   rightRail.position.x = roadWidth / 2 + 0.25;
   chunk.add(leftRail, rightRail);
 
   for (let z = 6; z < CHUNK_LENGTH; z += 12) {
-    const urnGeo = new THREE.CylinderGeometry(0.35, 0.45, 1.0, 6);
-    const leftUrn = new THREE.Mesh(urnGeo, mats.stoneTrim);
-    leftUrn.position.set(-roadWidth / 2 - 0.3, 0.7, z);
+    const urnGeo = new THREE.CylinderGeometry(0.35, 0.45, 1.0, 8);
+    const leftUrn = new THREE.Mesh(urnGeo, mats.stoneCarved);
+    leftUrn.position.set(-roadWidth / 2 - 0.35, 0.7, z);
     const rightUrn = leftUrn.clone();
-    rightUrn.position.x = roadWidth / 2 + 0.3;
+    rightUrn.position.x = roadWidth / 2 + 0.35;
     chunk.add(leftUrn, rightUrn);
 
-    if (Math.random() > 0.4) {
-      const fireGeo = new THREE.DodecahedronGeometry(0.25);
-      const fire = new THREE.Mesh(fireGeo, mats.torchFire);
-      fire.position.set(-roadWidth / 2 - 0.3, 1.35, z);
-      chunk.add(fire);
-      chunk.decorations.push(fire);
-    }
+    const fireOuterGeo = new THREE.DodecahedronGeometry(0.28);
+    const fireOuter = new THREE.Mesh(fireOuterGeo, mats.torchFire);
+    fireOuter.position.set(-roadWidth / 2 - 0.35, 1.45, z);
+
+    const fireInner = new THREE.Mesh(new THREE.DodecahedronGeometry(0.15), mats.torchCore);
+    fireOuter.add(fireInner);
+
+    chunk.add(fireOuter);
+    chunk.decorations.push(fireOuter);
+    torchFlames.push(fireOuter);
   }
 
-  const cliffHeight = 18;
-  const cliffGeo = new THREE.BoxGeometry(10, cliffHeight, CHUNK_LENGTH);
+  const cliffHeight = 20;
+  const cliffGeo = new THREE.BoxGeometry(12, cliffHeight, CHUNK_LENGTH);
   const leftCliff = new THREE.Mesh(cliffGeo, mats.cliffRock);
-  leftCliff.position.set(-roadWidth / 2 - 5.5, cliffHeight / 2 - 1, CHUNK_LENGTH / 2);
+  leftCliff.position.set(-roadWidth / 2 - 6.5, cliffHeight / 2 - 1, CHUNK_LENGTH / 2);
+  leftCliff.receiveShadow = true;
   const rightCliff = new THREE.Mesh(cliffGeo, mats.mossRock);
-  rightCliff.position.set(roadWidth / 2 + 5.5, cliffHeight / 2 - 1, CHUNK_LENGTH / 2);
+  rightCliff.position.set(roadWidth / 2 + 6.5, cliffHeight / 2 - 1, CHUNK_LENGTH / 2);
+  rightCliff.receiveShadow = true;
   chunk.add(leftCliff, rightCliff);
 
-  for (let z = 10; z < CHUNK_LENGTH; z += 20) {
-    const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 6, 5);
-    const trunk = new THREE.Mesh(trunkGeo, mats.wood);
+  for (let z = 10; z < CHUNK_LENGTH; z += 18) {
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.35, 6, 6), mats.wood);
     const side = Math.random() > 0.5 ? 1 : -1;
-    trunk.position.set(side * (roadWidth / 2 + 2.5), 3, z);
+    trunk.position.set(side * (roadWidth / 2 + 2.5), 3.0, z);
     trunk.rotation.z = side * -0.2;
 
-    const leavesGeo = new THREE.ConeGeometry(2.2, 3, 5);
-    const foliage = new THREE.Mesh(leavesGeo, mats.leaves);
-    foliage.position.set(side * (roadWidth / 2 + 2.5), 6.2, z);
+    const foliage = new THREE.Mesh(new THREE.ConeGeometry(2.4, 3.5, 6), mats.leaves);
+    foliage.position.set(side * (roadWidth / 2 + 2.5), 6.5, z);
     chunk.add(trunk, foliage);
   }
 
@@ -1108,33 +1258,48 @@ function populateChunk(chunk, isFirstChunk = false) {
     const type = ['JUMP_LOG', 'SLIDE_ARCH', 'SIDE_BLOCK', 'FIRE_PIT', 'SNAKE_COIL'][Math.floor(Math.random() * 5)];
 
     if (type === 'JUMP_LOG') {
-      const logGeo = new THREE.CylinderGeometry(0.45, 0.45, LANE_WIDTH * 3.2, 8);
-      const log = new THREE.Mesh(logGeo, mats.wood);
+      const logGroup = new THREE.Group();
+      const log = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, LANE_WIDTH * 3.2, 10), mats.wood);
       log.rotation.z = Math.PI / 2;
-      log.position.set(0, 0.35, localZ);
       log.castShadow = true;
-      chunk.add(log);
+      logGroup.add(log);
+
+      for (let s = -3; s <= 3; s++) {
+        const spike = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.35, 5), mats.spikes);
+        spike.position.set(s * 0.9, 0.42, 0);
+        spike.rotation.x = Math.PI;
+        logGroup.add(spike);
+      }
+
+      logGroup.position.set(0, 0.38, localZ);
+      chunk.add(logGroup);
 
       chunk.obstacles.push({
         type: 'LOW',
-        mesh: log,
+        mesh: logGroup,
         localZ: localZ,
         lanes: [-1, 0, 1],
         minY: 0,
-        maxY: 0.9,
+        maxY: 0.92,
         action: 'JUMP'
       });
     }
     else if (type === 'SLIDE_ARCH') {
       const archG = new THREE.Group();
-      const beamGeo = new THREE.BoxGeometry(LANE_WIDTH * 3.4, 0.9, 0.8);
-      const beam = new THREE.Mesh(beamGeo, mats.stoneTrim);
-      beam.position.set(0, 1.6, 0);
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(LANE_WIDTH * 3.4, 0.9, 0.8), mats.stoneCarved);
+      beam.position.set(0, 1.65, 0);
+      beam.castShadow = true;
 
-      const postL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 2.5, 0.8), mats.stoneTrim);
+      const postL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 2.5, 0.8), mats.stoneCarved);
       postL.position.set(-LANE_WIDTH * 1.5, 1.25, 0);
       const postR = postL.clone();
       postR.position.x = LANE_WIDTH * 1.5;
+
+      for (let v = -2; v <= 2; v++) {
+        const vine = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.03, 0.8, 5), mats.leaves);
+        vine.position.set(v * 0.9, 0.95, 0.25);
+        archG.add(vine);
+      }
 
       archG.add(beam, postL, postR);
       archG.position.set(0, 0, localZ);
@@ -1152,9 +1317,8 @@ function populateChunk(chunk, isFirstChunk = false) {
     }
     else if (type === 'SIDE_BLOCK') {
       const blockedLane = [-1, 0, 1][Math.floor(Math.random() * 3)];
-      const boulderGeo = new THREE.DodecahedronGeometry(1.1);
-      const boulder = new THREE.Mesh(boulderGeo, mats.cliffRock);
-      boulder.position.set(LANES[blockedLane], 0.9, localZ);
+      const boulder = new THREE.Mesh(new THREE.DodecahedronGeometry(1.15), mats.cliffRock);
+      boulder.position.set(LANES[blockedLane], 0.92, localZ);
       boulder.castShadow = true;
       chunk.add(boulder);
 
@@ -1170,10 +1334,9 @@ function populateChunk(chunk, isFirstChunk = false) {
     }
     else if (type === 'FIRE_PIT') {
       const laneChoice = [-1, 1][Math.floor(Math.random() * 2)];
-      const pitGeo = new THREE.CylinderGeometry(0.8, 0.9, 0.4, 8);
-      const pit = new THREE.Mesh(pitGeo, mats.stoneTrim);
-      const fire = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.2, 6), mats.torchFire);
-      fire.position.y = 0.6;
+      const pit = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 0.4, 10), mats.stoneCarved);
+      const fire = new THREE.Mesh(new THREE.ConeGeometry(0.65, 1.3, 6), mats.torchFire);
+      fire.position.y = 0.65;
       pit.add(fire);
       pit.position.set(LANES[laneChoice], 0.2, localZ);
       chunk.add(pit);
@@ -1184,13 +1347,12 @@ function populateChunk(chunk, isFirstChunk = false) {
         localZ: localZ,
         lanes: [laneChoice],
         minY: 0,
-        maxY: 1.2,
+        maxY: 1.25,
         action: 'JUMP_OR_DODGE'
       });
     }
     else if (type === 'SNAKE_COIL') {
-      const rootGeo = new THREE.TorusGeometry(1.6, 0.35, 6, 12, Math.PI);
-      const root = new THREE.Mesh(rootGeo, mats.mossRock);
+      const root = new THREE.Mesh(new THREE.TorusGeometry(1.65, 0.35, 8, 16, Math.PI), mats.mossRock);
       root.rotation.x = Math.PI;
       root.position.set(0, 2.3, localZ);
       chunk.add(root);
@@ -1207,7 +1369,6 @@ function populateChunk(chunk, isFirstChunk = false) {
     }
   }
 
-  // Collectible Gold Coins & Powerups
   const coinPattern = Math.floor(Math.random() * 3);
   const targetLane = [-1, 0, 1][Math.floor(Math.random() * 3)];
   const coinStartZ = 6 + Math.random() * 8;
@@ -1215,14 +1376,14 @@ function populateChunk(chunk, isFirstChunk = false) {
 
   for (let c = 0; c < numCoins; c++) {
     const cZ = coinStartZ + c * 2.2;
-    const diamondGeo = new THREE.OctahedronGeometry(0.32, 0);
+    const diamondGeo = new THREE.OctahedronGeometry(0.34, 0);
     diamondGeo.scale(1, 1.4, 1);
     const coinMesh = new THREE.Mesh(diamondGeo, mats.goldCoin);
 
-    let coinY = 0.9;
+    let coinY = 0.92;
     if (coinPattern === 1) {
       const norm = (c / (numCoins - 1)) * 2 - 1;
-      coinY = 0.9 + (1 - norm * norm) * 1.8;
+      coinY = 0.92 + (1 - norm * norm) * 1.8;
     }
 
     coinMesh.position.set(LANES[targetLane], coinY, cZ);
@@ -1237,7 +1398,6 @@ function populateChunk(chunk, isFirstChunk = false) {
     });
   }
 
-  // Powerup Token
   if (Math.random() < 0.28) {
     const pLane = [-1, 0, 1][Math.floor(Math.random() * 3)];
     const pZ = 24 + Math.random() * 15;
@@ -1246,7 +1406,7 @@ function populateChunk(chunk, isFirstChunk = false) {
     const pGeo = new THREE.DodecahedronGeometry(0.55);
     let pMat = mats.rubyGem;
     if (pType === 'WINGS') pMat = mats.wingsGlow;
-    if (pType === 'SHIELD') pMat = mats.shieldAura;
+    if (pType === 'SHIELD') pMat = mats.emeraldGem;
 
     const pMesh = new THREE.Mesh(pGeo, pMat);
     pMesh.position.set(LANES[pLane], 1.4, pZ);
@@ -1262,58 +1422,65 @@ function populateChunk(chunk, isFirstChunk = false) {
   }
 }
 
-/* =========================================================================
-   SCENE SETUP & INITIALIZATION
-   ========================================================================= */
-
 function initEngine() {
   const canvas = document.getElementById('webgl');
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x1a2618);
-  scene.fog = new THREE.FogExp2(0x1a2618, 0.015);
+  scene.background = new THREE.Color(0x121e15);
+  scene.fog = new THREE.FogExp2(0x121e15, 0.015);
 
   camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 350);
   camera.position.set(0, 4.2, -6.5);
   camera.lookAt(0, 1.6, 12);
 
-  renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    powerPreference: 'high-performance'
+  });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  const ambientLight = new THREE.AmbientLight(0xfff3d6, 0.75);
-  scene.add(ambientLight);
+  initMaterials();
 
-  const sunLight = new THREE.DirectionalLight(0xfffae0, 1.35);
-  sunLight.position.set(-15, 30, -10);
+  const hemiLight = new THREE.HemisphereLight(0x7ed0ff, 0x24331e, 0.85);
+  scene.add(hemiLight);
+
+  const sunLight = new THREE.DirectionalLight(0xfff8e7, 1.35);
+  sunLight.position.set(-16, 32, -10);
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.width = 1024;
   sunLight.shadow.mapSize.height = 1024;
   sunLight.shadow.camera.near = 0.5;
-  sunLight.shadow.camera.far = 120;
+  sunLight.shadow.camera.far = 130;
   sunLight.shadow.camera.left = -20;
   sunLight.shadow.camera.right = 20;
   sunLight.shadow.camera.top = 20;
   sunLight.shadow.camera.bottom = -20;
+  sunLight.shadow.bias = -0.0004;
   scene.add(sunLight);
+  scene.sunLight = sunLight;
 
-  const fillLight = new THREE.DirectionalLight(0xaad8a0, 0.55);
-  fillLight.position.set(10, 10, 20);
+  const fillLight = new THREE.DirectionalLight(0x9bd88f, 0.55);
+  fillLight.position.set(12, 12, 20);
   scene.add(fillLight);
 
-  // Warrior Character
+  particleSystem = new ParticleEngine(160);
+  scene.add(particleSystem.points);
+
   playerGroup = new THREE.Group();
   warriorMesh = createWarriorMesh();
   playerGroup.add(warriorMesh);
   scene.add(playerGroup);
 
-  // Demon Pursuer
   demonGroup = createDemonMesh();
   scene.add(demonGroup);
 
-  // Track Chunks
   for (let i = 0; i < VISIBLE_CHUNKS; i++) {
     const chunk = createTrackChunk();
     chunk.position.z = i * CHUNK_LENGTH;
@@ -1333,10 +1500,6 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
-
-/* =========================================================================
-   DIRECTIONAL CONTROLS & GESTURE INPUT
-   ========================================================================= */
 
 function setupInputHandlers() {
   window.addEventListener('keydown', e => {
@@ -1418,6 +1581,7 @@ function doJump() {
     player.vy = JUMP_VELOCITY;
     player.isGrounded = false;
     sound.playJump();
+    particleSystem.puffDust(player.x, player.y, player.z);
   }
 }
 
@@ -1427,6 +1591,7 @@ function doSlide() {
     player.isSliding = true;
     player.slideTimer = 0.65;
     sound.playSlide();
+    particleSystem.puffDust(player.x, player.y, player.z);
   }
 }
 
@@ -1435,7 +1600,7 @@ function activatePowerMeter() {
   if (powerMeter >= 100) {
     powerMeter = 0;
     updatePowerUI();
-    triggerPowerup('WINGS', 9);
+    triggerPowerup('WINGS', 10);
     showBanner("🔥 FLAME BOOST WINGS! 🔥");
   }
 }
@@ -1445,6 +1610,7 @@ function triggerPowerup(type, duration) {
   if (type === 'WINGS') {
     powerups.wings = duration;
     wingsMesh.visible = true;
+    speedFx.classList.add('active');
     showBanner("🪽 FLAME WINGS ACTIVATED!");
   } else if (type === 'MAGNET') {
     powerups.magnet = duration;
@@ -1467,10 +1633,6 @@ function triggerCameraShake(intensity = 0.4) {
   cameraShake = intensity;
 }
 
-/* =========================================================================
-   GAME STATE & RUN LOOP
-   ========================================================================= */
-
 function startNewGame() {
   sound.init();
   startMenu.style.display = 'none';
@@ -1489,19 +1651,20 @@ function startNewGame() {
   player.stumbleTimer = 0;
   player.hasShield = false;
 
-  demon.gap = 8.5;
-  demon.targetGap = 8.5;
+  demon.gap = 8.0;
+  demon.targetGap = 8.0;
 
   score = 0;
   coins = 0;
   distance = 0;
   runSpeed = BASE_SPEED;
-  powerMeter = 20;
+  powerMeter = 25;
   powerups.wings = 0;
   powerups.magnet = 0;
   powerups.shield = 0;
   wingsMesh.visible = false;
   shieldMesh.visible = false;
+  speedFx.classList.remove('active');
 
   activeChunks.forEach((chunk, i) => {
     chunk.position.z = i * CHUNK_LENGTH;
@@ -1526,11 +1689,12 @@ function togglePause() {
   }
 }
 
-function gameOver(reason = "Caught by the Demon Monkey!") {
+function gameOver(reason = "Caught by the Demon Beast!") {
   gameState = 'GAMEOVER';
   sound.playHit();
   sound.playDemonRoar();
-  triggerCameraShake(0.8);
+  triggerCameraShake(0.85);
+  speedFx.classList.remove('active');
 
   if (score > highScore) {
     highScore = score;
@@ -1554,10 +1718,6 @@ function gameOver(reason = "Caught by the Demon Monkey!") {
   }, 900);
 }
 
-/* =========================================================================
-   WARRIOR SKELETAL ANIMATION SYSTEM & UPDATE LOOP
-   ========================================================================= */
-
 function animateLoop() {
   requestAnimationFrame(animateLoop);
 
@@ -1567,19 +1727,25 @@ function animateLoop() {
     updateGameLogic(delta);
   }
 
+  torchFlames.forEach((flame, idx) => {
+    const s = 1.0 + Math.sin(clock.getElapsedTime() * 8 + idx) * 0.12;
+    flame.scale.set(s, s * 1.2, s);
+  });
+
+  particleSystem.update(delta);
   renderer.render(scene, camera);
 }
 
 function updateGameLogic(delta) {
-  const currentSpeed = powerups.wings > 0 ? runSpeed * 1.7 : runSpeed;
-  runSpeed = Math.min(MAX_SPEED, BASE_SPEED + (distance / 400) * 4);
+  const currentSpeed = powerups.wings > 0 ? runSpeed * 1.75 : runSpeed;
+  runSpeed = Math.min(MAX_SPEED, BASE_SPEED + (distance / 400) * 4.5);
 
   const moveDist = currentSpeed * delta;
   player.z += moveDist;
   distance += moveDist * 0.4;
-  score += Math.floor(moveDist * 4);
+  score += Math.floor(moveDist * 4.5);
 
-  player.x += (player.targetX - player.x) * 14 * delta;
+  player.x += (player.targetX - player.x) * 15 * delta;
 
   if (!player.isGrounded) {
     player.vy += GRAVITY * delta;
@@ -1588,11 +1754,15 @@ function updateGameLogic(delta) {
       player.y = 0;
       player.vy = 0;
       player.isGrounded = true;
+      particleSystem.puffDust(player.x, player.y, player.z);
     }
   }
 
   if (player.isSliding) {
     player.slideTimer -= delta;
+    if (Math.random() < 0.3) {
+      particleSystem.puffDust(player.x, player.y, player.z);
+    }
     if (player.slideTimer <= 0) {
       player.isSliding = false;
     }
@@ -1601,7 +1771,7 @@ function updateGameLogic(delta) {
   playerGroup.position.set(player.x, player.y, player.z);
 
   const lateralVelocity = player.targetX - player.x;
-  playerGroup.rotation.z += (lateralVelocity * 0.16 - playerGroup.rotation.z) * 12 * delta;
+  playerGroup.rotation.z += (lateralVelocity * 0.16 - playerGroup.rotation.z) * 14 * delta;
   playerGroup.rotation.y = lateralVelocity * -0.1;
 
   player.runAnimTime += delta * (currentSpeed * 0.55);
@@ -1617,7 +1787,7 @@ function updateGameLogic(delta) {
   const headG = warriorMesh.headGroup;
 
   if (player.isSliding) {
-    hips.position.y = 0.35;
+    hips.position.y = 0.36;
     spine.rotation.x = 0.95;
     spine.rotation.y = -0.2;
     headG.rotation.x = -0.6;
@@ -1663,17 +1833,28 @@ function updateGameLogic(delta) {
     leftArm.rotation.z = 0.15;
     rightArm.rotation.x = sinRun * 0.9;
     rightArm.rotation.z = -0.15;
+
+    if (bounce < 0.02 && Math.random() < 0.35) {
+      particleSystem.puffDust(player.x, player.y, player.z);
+    }
   }
 
-  demon.targetGap = player.stumbleTimer > 0 ? 3.8 : 8.5;
+  demon.targetGap = player.stumbleTimer > 0 ? 3.8 : 8.0;
   demon.gap += (demon.targetGap - demon.gap) * 3 * delta;
   demon.x += (player.x - demon.x) * 6 * delta;
   demon.z = player.z - demon.gap;
   demon.y = player.y;
 
   demonGroup.position.set(demon.x, demon.y, demon.z);
-  demon.animTime += delta * 15;
+  demon.animTime += delta * 16;
   demonGroup.position.y += Math.sin(demon.animTime) * 0.2;
+  demonGroup.leftArm.rotation.x = Math.sin(demon.animTime) * 0.8;
+  demonGroup.rightArm.rotation.x = -Math.sin(demon.animTime) * 0.8;
+
+  if (scene.sunLight) {
+    scene.sunLight.position.set(player.x - 16, 32, player.z - 10);
+    scene.sunLight.target = playerGroup;
+  }
 
   if (player.stumbleTimer > 0) {
     player.stumbleTimer -= delta;
@@ -1681,13 +1862,19 @@ function updateGameLogic(delta) {
 
   if (powerups.wings > 0) {
     powerups.wings -= delta;
-    wingsMesh.rotation.z = Math.sin(player.runAnimTime * 20) * 0.25;
-    if (powerups.wings <= 0) wingsMesh.visible = false;
+    wingsMesh.rotation.z = Math.sin(player.runAnimTime * 22) * 0.25;
+    if (Math.random() < 0.4) {
+      particleSystem.emit(player.x, player.y + 1.2, player.z - 0.5, (Math.random() - 0.5) * 2, 2, -4, 1.0, 0.6, 0.1, 0.4);
+    }
+    if (powerups.wings <= 0) {
+      wingsMesh.visible = false;
+      speedFx.classList.remove('active');
+    }
   }
   if (powerups.magnet > 0) powerups.magnet -= delta;
   if (powerups.shield > 0) {
     powerups.shield -= delta;
-    shieldMesh.rotation.y += delta * 3;
+    shieldMesh.rotation.y += delta * 3.5;
     if (powerups.shield <= 0) {
       shieldMesh.visible = false;
       player.hasShield = false;
@@ -1695,6 +1882,13 @@ function updateGameLogic(delta) {
   }
 
   activeChunks.forEach(chunk => {
+    chunk.obstacles.forEach(obs => {
+      const globalZ = chunk.position.z + obs.localZ;
+      if (globalZ < player.z + 0.3) {
+        obs.mesh.visible = false;
+      }
+    });
+
     if (chunk.position.z + CHUNK_LENGTH < player.z - 15) {
       chunk.position.z = chunkZ;
       chunkZ += CHUNK_LENGTH;
@@ -1722,25 +1916,27 @@ function checkCollisions() {
           if (obs.type === 'LOW') {
             if (player.y < obs.maxY) collided = true;
           } else if (obs.type === 'HIGH') {
-            if (!player.isSliding || player.y > 0.4) collided = true;
+            if (!player.isSliding || player.y > 0.45) collided = true;
           } else if (obs.type === 'LANE') {
             collided = true;
           }
 
           if (collided) {
             if (powerups.wings > 0) {
-              obs.mesh.position.y += 10;
+              obs.mesh.position.y += 12;
               triggerCameraShake(0.2);
+              particleSystem.burstGems(player.x, player.y + 1.0, player.z);
             } else if (player.hasShield) {
               player.hasShield = false;
               powerups.shield = 0;
               shieldMesh.visible = false;
               sound.playHit();
-              triggerCameraShake(0.4);
+              triggerCameraShake(0.45);
+              particleSystem.burstGems(player.x, player.y + 1.2, player.z);
               showBanner("🛡️ SHIELD BROKE!");
               obs.lanes = [];
             } else {
-              gameOver("Crashed into an obstacle!");
+              gameOver("Crashed into an ancient ruin!");
             }
           }
         }
@@ -1754,17 +1950,19 @@ function checkCollisions() {
       const distZ = Math.abs(globalZ - player.z);
       const distX = Math.abs(col.mesh.position.x - player.x);
 
-      col.mesh.rotation.y += 0.04;
+      col.mesh.rotation.y += 0.05;
 
-      if (powerups.magnet > 0 && col.type === 'COIN' && Math.abs(globalZ - player.z) < 22) {
-        col.mesh.position.x += (player.x - col.mesh.position.x) * 0.18;
-        col.mesh.position.y += (player.y + 1.2 - col.mesh.position.y) * 0.18;
-        col.mesh.position.z += (player.z - globalZ) * 0.18;
+      if (powerups.magnet > 0 && col.type === 'COIN' && Math.abs(globalZ - player.z) < 24) {
+        col.mesh.position.x += (player.x - col.mesh.position.x) * 0.2;
+        col.mesh.position.y += (player.y + 1.2 - col.mesh.position.y) * 0.2;
+        col.mesh.position.z += (player.z - globalZ) * 0.2;
       }
 
       if (distZ < 1.5 && distX < 1.4 && Math.abs(col.mesh.position.y - (player.y + 1.0)) < 1.6) {
         col.collected = true;
         col.mesh.visible = false;
+
+        particleSystem.burstGems(col.mesh.position.x, col.mesh.position.y, globalZ);
 
         if (col.type === 'COIN') {
           coins++;
@@ -1781,26 +1979,26 @@ function checkCollisions() {
 }
 
 function updateCamera(delta) {
-  const targetCamX = player.x * 0.6;
-  const targetCamY = player.y + 3.8;
-  const targetCamZ = player.z - 6.2;
+  const targetCamX = player.x * 0.65;
+  const targetCamY = player.y + 4.0;
+  const targetCamZ = player.z - 6.5;
 
-  camera.position.x += (targetCamX - camera.position.x) * 10 * delta;
-  camera.position.y += (targetCamY - camera.position.y) * 8 * delta;
+  camera.position.x += (targetCamX - camera.position.x) * 12 * delta;
+  camera.position.y += (targetCamY - camera.position.y) * 9 * delta;
   camera.position.z += (targetCamZ - camera.position.z) * 16 * delta;
+
+  const targetFov = powerups.wings > 0 ? 74 : (65 + (runSpeed - BASE_SPEED) * 0.25);
+  camera.fov += (targetFov - camera.fov) * 5 * delta;
+  camera.updateProjectionMatrix();
 
   if (cameraShake > 0) {
     camera.position.x += (Math.random() - 0.5) * cameraShake;
     camera.position.y += (Math.random() - 0.5) * cameraShake;
-    cameraShake = Math.max(0, cameraShake - delta * 2);
+    cameraShake = Math.max(0, cameraShake - delta * 2.2);
   }
 
-  camera.lookAt(player.x * 0.3, player.y + 1.6, player.z + 14);
+  camera.lookAt(player.x * 0.35, player.y + 1.6, player.z + 14);
 }
-
-/* =========================================================================
-   HUD & UI HELPERS
-   ========================================================================= */
 
 function updateHUD() {
   scoreDisplay.textContent = score.toLocaleString();

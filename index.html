@@ -748,11 +748,11 @@ function createCliffTexture() {
    ========================================================================= */
 const LANE_WIDTH = 2.5;
 
-// Correct 3-lane coordinates: Left is -X, Center is 0, Right is +X
+// Correct 3-lane coordinates in camera view: Left is +X, Center is 0, Right is -X
 const LANES = {
-  '-1': -LANE_WIDTH, // Left
-  '0': 0,            // Center
-  '1': LANE_WIDTH    // Right
+  '-1': LANE_WIDTH,  // Left lane on screen
+  '0': 0,            // Center lane
+  '1': -LANE_WIDTH   // Right lane on screen
 };
 
 const CHUNK_LENGTH = 50;
@@ -2224,8 +2224,8 @@ function updateGameLogic(delta) {
   // Position Player & Banking
   playerGroup.position.set(player.x, player.y, player.z);
   const lateralVelocity = player.targetX - player.x;
-  playerGroup.rotation.z += (lateralVelocity * -0.16 - playerGroup.rotation.z) * 14 * delta;
-  playerGroup.rotation.y = lateralVelocity * 0.1;
+  playerGroup.rotation.z += (lateralVelocity * 0.16 - playerGroup.rotation.z) * 14 * delta;
+  playerGroup.rotation.y = lateralVelocity * -0.1;
 
   // Shadow projection scaling with jump height
   const shadowScale = Math.max(0.3, 1.0 - (player.y / 4.0));
